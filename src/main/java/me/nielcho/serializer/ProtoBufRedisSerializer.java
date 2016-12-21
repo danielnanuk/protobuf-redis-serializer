@@ -29,8 +29,8 @@ public class ProtoBufRedisSerializer implements RedisSerializer<Object> {
             return byte0;
         }
         int len = byte0.length;
-        for (byte[] aByte : bytes) {
-            len += aByte.length;
+        for (byte[] bytes1 : bytes) {
+            len += bytes1.length;
         }
         byte[] combined = new byte[len];
         System.arraycopy(byte0, 0, combined, 0, byte0.length);
