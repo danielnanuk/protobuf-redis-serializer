@@ -8,17 +8,22 @@ import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-/**
-
-
- */
 public class ProtoBufRedisSerializer implements RedisSerializer<Object> {
 
-    private static final Charset UTF_8 = Charset.forName("UTF8");
+    private static final Charset ASCII = Charset.forName("ASCII");
+
+    // 用来标记类名长度的byte数组长度
     private static final int MARK_WORD_LENGTH = 4;
     private Class<byte[]> BYTE_ARRAY_CLASS = byte[].class;
     private byte[] EMPTY_BYTE = new byte[0];
 
+    /**
+     * 合并多个byte数组，采用System.arraycopy
+     *
+     * @param byte0 需合并的数组
+     * @param bytes 变长的byte数组
+     * @return 合并后的新数组
+     */
     private static byte[] merge(byte[] byte0, byte[]... bytes) {
         if (bytes == null || bytes.length == 0) {
             return byte0;
@@ -44,7 +49,7 @@ public class ProtoBufRedisSerializer implements RedisSerializer<Object> {
         }
         byte[] result = ((GeneratedMessageV3) object).toByteArray();
         String className = object.getClass().getName();
-        byte[] classNameBytes = className.getBytes(UTF_8);
+        byte[] classNameBytes = className.getBytes(ASCII);
         int len = classNameBytes.length;
         byte[] markWord = ByteBuffer.allocate(MARK_WORD_LENGTH).putInt(len).array();
         return merge(markWord, classNameBytes, result);
@@ -58,7 +63,7 @@ public class ProtoBufRedisSerializer implements RedisSerializer<Object> {
         int len = ByteBuffer.wrap(bytes, 0, MARK_WORD_LENGTH).getInt();
         byte[] classNameBytes = new byte[len];
         System.arraycopy(bytes, MARK_WORD_LENGTH, classNameBytes, 0, len);
-        String className = new String(classNameBytes, UTF_8);
+        String className = new String(classNameBytes, ASCII);
         byte[] protoBufByte = new byte[bytes.length - len - MARK_WORD_LENGTH];
         System.arraycopy(bytes, MARK_WORD_LENGTH + len, protoBufByte, 0, protoBufByte.length);
         try {
