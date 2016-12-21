@@ -1,0 +1,4 @@
+# protobuf-redis-serializer
+使用ProtoBuf来实现RedisSerializer
+取前四个字节记录类名长度，后面的存储类名，通过反射调用parseFrom方法
+只支持syntax=proto3
